@@ -5,7 +5,7 @@ import (
 )
 
 var (
-	Version = "dev"
+	version = "dev"
 )
 
 type Engine struct {
@@ -13,7 +13,7 @@ type Engine struct {
 }
 
 func New() *Engine {
-	e := &Engine{Engine: stdcli.New("keep", Version)}
+	e := &Engine{Engine: stdcli.New("keep", version)}
 
 	e.Register()
 
