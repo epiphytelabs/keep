@@ -1,0 +1,15 @@
+environment:
+  APP_KEY: !secret 32
+  DB_CONNECTION: pgsql
+  DB_DATABASE: !resource postgres path
+  DB_HOST: !resource postgres host
+  DB_PASSWORD: !resource postgres password
+  DB_PORT: !resource postgres port
+  DB_USERNAME: !resource postgres username
+  WAITFORIT_TIMEOUT: 5
+image: fireflyiii/core:version-5.7.10
+port: 8080
+resources:
+  - postgres
+volumes:
+  - /var/www/html/storage/upload
