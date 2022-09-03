@@ -4,15 +4,11 @@ import (
 	"github.com/ddollar/stdcli"
 )
 
-var (
-	version = "dev"
-)
-
 type Engine struct {
 	*stdcli.Engine
 }
 
-func New() *Engine {
+func New(version string) *Engine {
 	e := &Engine{Engine: stdcli.New("keep", version)}
 
 	e.Register()

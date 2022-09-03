@@ -6,6 +6,10 @@ import (
 	"github.com/epiphytelabs/keep/pkg/cli"
 )
 
+var (
+	version = "dev"
+)
+
 func main() {
-	os.Exit(cli.New().Execute(os.Args[1:]))
+	os.Exit(cli.New(version).Execute(os.Args[1:]))
 }
