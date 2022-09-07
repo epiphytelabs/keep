@@ -3,8 +3,7 @@
 ## Installation
 
 ```
-brew tap epiphytelabs/tap
-brew install keep
+brew install epiphytelabs/brew/keep
 keep server install
 ```
 
