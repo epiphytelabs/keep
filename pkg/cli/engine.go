@@ -22,6 +22,22 @@ func (e *Engine) Register() {
 		Validate: stdcli.Args(1),
 	})
 
+	e.Command("list", "list installed applicaitons", e.List, stdcli.CommandOptions{
+		Validate: stdcli.Args(0),
+	})
+
+	e.Command("server certificate", "display the keep server certificate", e.ServerCertificate, stdcli.CommandOptions{
+		Validate: stdcli.Args(0),
+	})
+
+	e.Command("server install", "install the keep server", e.ServerInstall, stdcli.CommandOptions{
+		Validate: stdcli.Args(0),
+	})
+
+	e.Command("server uninstall", "install the keep server", e.ServerUninstall, stdcli.CommandOptions{
+		Validate: stdcli.Args(0),
+	})
+
 	e.Command("uninstall", "uninstall an application", e.Uninstall, stdcli.CommandOptions{
 		Usage:    "<app>",
 		Validate: stdcli.Args(1),

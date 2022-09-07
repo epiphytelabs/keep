@@ -19,6 +19,10 @@ func Get(name string) (*App, error) {
 	return nil, fmt.Errorf("app not found: %s", name)
 }
 
+func Installed() ([]string, error) {
+	return installed()
+}
+
 func List() ([]App, error) {
 	return []App{}, nil
 }

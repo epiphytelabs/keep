@@ -16,6 +16,10 @@ func (e *Engine) Install(ctx *stdcli.Context) error {
 		return err
 	}
 
+	if a.Installed {
+		return fmt.Errorf("already installed")
+	}
+
 	net, err := e.installCreateNetwork(ctx, name)
 	if err != nil {
 		return err
@@ -42,7 +46,7 @@ func (e *Engine) installCreateApp(ctx *stdcli.Context, net *docker.Network, a *r
 		return err
 	}
 
-	if err := c.Pull(); err != nil {
+	if err := docker.Pull(c.Image); err != nil {
 		return err
 	}
 
@@ -80,7 +84,7 @@ func (e *Engine) installCreateResource(ctx *stdcli.Context, net *docker.Network,
 		return err
 	}
 
-	if err := c.Pull(); err != nil {
+	if err := docker.Pull(c.Image); err != nil {
 		return err
 	}
 

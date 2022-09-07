@@ -2,9 +2,14 @@ package server
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
+
+	"github.com/epiphytelabs/keep/pkg/cert"
+	"github.com/miekg/dns"
 )
 
 type Routes map[string]http.Handler
@@ -21,7 +26,18 @@ func New(routes Routes) *Server {
 }
 
 func (s *Server) Listen(addr string) error {
-	return http.ListenAndServe(addr, s.router())
+	if !certificateExists() {
+		if err := generateCertificate(); err != nil {
+			return err
+		}
+	}
+
+	dns.HandleFunc("keep.", resolve)
+
+	ds := &dns.Server{Addr: ":53", Net: "udp"}
+	go ds.ListenAndServe()
+
+	return http.ListenAndServeTLS(addr, "/etc/keep/ssl/cert.pem", "/etc/keep/ssl/cert.key", s.router())
 }
 
 func (s *Server) UpdateRoutes(routes Routes) {
@@ -49,11 +65,48 @@ func (s *Server) router() http.Handler {
 		host := strings.Split(r.Host, ":")[0]
 
 		if h := s.route(host); h != nil {
-			fmt.Printf("host: %+v\n", host)
 			h.ServeHTTP(w, r)
 		} else {
 			fmt.Println("404")
 			w.WriteHeader(http.StatusNotFound)
 		}
 	})
+}
+
+func certificateExists() bool {
+	if _, err := os.Stat("/etc/keep/ssl/cert.pem"); err != nil {
+		return false
+	}
+
+	if _, err := os.Stat("/etc/keep/ssl/cert.key"); err != nil {
+		return false
+	}
+
+	return true
+}
+
+func generateCertificate() error {
+	c, err := cert.SelfSigned("*.app.keep")
+	if err != nil {
+		return err
+	}
+
+	pub, key, err := cert.Parts(c)
+	if err != nil {
+		return err
+	}
+
+	if err := os.MkdirAll("/etc/keep/ssl", 0755); err != nil {
+		return err
+	}
+
+	if err := ioutil.WriteFile("/etc/keep/ssl/cert.pem", []byte(pub), 0644); err != nil {
+		return err
+	}
+
+	if err := ioutil.WriteFile("/etc/keep/ssl/cert.key", []byte(key), 0600); err != nil {
+		return err
+	}
+
+	return nil
 }

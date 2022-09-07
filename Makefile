@@ -13,7 +13,7 @@ compress: $(binaries)
 	upx-ucl -1 $^
 
 image:
-	docker build -t epiphytelabs/keep:latest .
+	docker build -t epiphytelabs/keep:dev .
 
 test: test-install test-serve
 
@@ -26,11 +26,9 @@ test-install: binaries
 	dist/keep install firefly
 
 test-serve: binaries image
-	@docker run \
-		-it -p 40001:80 \
-		-v /var/run/docker.sock:/var/run/docker.sock \
-		--net keep \
-		epiphytelabs/keep:latest
+	dist/keep server uninstall || true
+	dist/keep server install
+	docker logs -f keep
 
 vendor:
 	go mod tidy

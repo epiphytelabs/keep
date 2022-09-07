@@ -6,6 +6,7 @@ environment:
   DB_PASSWORD: !resource postgres password
   DB_PORT: !resource postgres port
   DB_USERNAME: !resource postgres username
+  TRUSTED_PROXIES: "**"
   WAITFORIT_TIMEOUT: 5
 image: fireflyiii/core:version-5.7.10
 port: 8080

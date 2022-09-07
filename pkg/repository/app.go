@@ -14,6 +14,7 @@ import (
 type App struct {
 	Environment Environment
 	Image       string
+	Installed   bool
 	Name        string
 	Port        int
 	Resources   Resources
@@ -57,6 +58,17 @@ func (a *App) Container() (*docker.Container, error) {
 }
 
 func apps() ([]App, error) {
+	is, err := installed()
+	if err != nil {
+		return nil, err
+	}
+
+	ish := map[string]bool{}
+
+	for _, i := range is {
+		ish[i] = true
+	}
+
 	fs, err := keep.Apps.ReadDir("apps")
 	if err != nil {
 		return nil, err
@@ -80,10 +92,27 @@ func apps() ([]App, error) {
 			return nil, err
 		}
 
+		a.Installed = ish[a.Name]
+
 		as = append(as, a)
 	}
 
 	sort.Slice(as, func(i, j int) bool { return as[i].Name < as[j].Name })
 
 	return as, nil
+}
+
+func installed() ([]string, error) {
+	cs, err := docker.Ps(map[string]string{"system": "keep", "type": "app"})
+	if err != nil {
+		return nil, err
+	}
+
+	is := []string{}
+
+	for _, c := range cs {
+		is = append(is, c.Labels["app"])
+	}
+
+	return is, nil
 }

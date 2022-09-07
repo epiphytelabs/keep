@@ -16,6 +16,10 @@ func (e *Engine) Uninstall(ctx *stdcli.Context) error {
 		return err
 	}
 
+	if !a.Installed {
+		return fmt.Errorf("not installed")
+	}
+
 	if err := e.uninstallRemoveApp(ctx, a); err != nil {
 		_ = ctx.Error(err)
 	}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
@@ -28,11 +29,18 @@ func run() error {
 	go update(s, "start")
 	go update(s, "stop")
 
-	if err := s.Listen(":80"); err != nil {
+	if err := s.Listen(":443"); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func director(original func(*http.Request)) func(*http.Request) {
+	return func(r *http.Request) {
+		original(r)
+		r.Header.Add("X-Forwarded-Proto", "https")
+	}
 }
 
 func routes() (server.Routes, error) {
@@ -46,7 +54,9 @@ func routes() (server.Routes, error) {
 	for _, c := range cs {
 		if port := c.Labels["port"]; port != "" {
 			remote := &url.URL{Scheme: "http", Host: fmt.Sprintf("%s:%s", c.Name, port)}
-			routes[fmt.Sprintf("%s.keep", c.Labels["app"])] = httputil.NewSingleHostReverseProxy(remote)
+			proxy := httputil.NewSingleHostReverseProxy(remote)
+			proxy.Director = director(proxy.Director)
+			routes[fmt.Sprintf("%s.app.keep", c.Labels["app"])] = proxy
 		}
 	}
 
