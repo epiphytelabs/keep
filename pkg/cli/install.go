@@ -1,14 +1,22 @@
 package cli
 
 import (
+	"crypto/tls"
 	"fmt"
+	"net/http"
+	"time"
 
 	"github.com/ddollar/stdcli"
 	"github.com/epiphytelabs/keep/pkg/docker"
 	"github.com/epiphytelabs/keep/pkg/repository"
+	"github.com/pkg/browser"
 )
 
 func (e *Engine) Install(ctx *stdcli.Context) error {
+	if err := docker.Info(); err != nil {
+		return fmt.Errorf("could not connect to docker")
+	}
+
 	name := ctx.Arg(0)
 
 	a, err := repository.Get(name)
@@ -35,7 +43,15 @@ func (e *Engine) Install(ctx *stdcli.Context) error {
 		return err
 	}
 
-	ctx.Writef("url: <url>https://%s.app.keep</url>", name)
+	url := fmt.Sprintf("https://%s.app.keep", name)
+
+	if err := e.installWait(ctx, url); err != nil {
+		return err
+	}
+
+	_ = ctx.Writef("%s\n", url)
+
+	_ = browser.OpenURL(url)
 
 	return nil
 }
@@ -103,4 +119,32 @@ func (e *Engine) installCreateResource(ctx *stdcli.Context, net *docker.Network,
 	}
 
 	return ctx.OK()
+}
+
+func (e *Engine) installWait(ctx *stdcli.Context, url string) error {
+	ctx.Startf("waiting for app to start")
+
+	tick := time.NewTicker(5 * time.Second)
+	timeout := time.After(5 * time.Minute)
+
+	c := &http.Client{
+		Timeout: 2 * time.Second,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		},
+	}
+
+	for {
+		select {
+		case <-tick.C:
+			res, err := c.Get(url)
+			if err == nil && res.StatusCode == 200 {
+				return ctx.OK()
+			}
+		case <-timeout:
+			return fmt.Errorf("timeout")
+		}
+	}
 }

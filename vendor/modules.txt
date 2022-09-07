@@ -22,6 +22,9 @@ github.com/miekg/dns
 # github.com/mitchellh/go-homedir v1.1.0
 ## explicit
 github.com/mitchellh/go-homedir
+# github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8
+## explicit; go 1.14
+github.com/pkg/browser
 # github.com/spf13/pflag v1.0.5
 ## explicit; go 1.12
 github.com/spf13/pflag

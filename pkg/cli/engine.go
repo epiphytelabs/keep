@@ -22,11 +22,7 @@ func (e *Engine) Register() {
 		Validate: stdcli.Args(1),
 	})
 
-	e.Command("list", "list installed applicaitons", e.List, stdcli.CommandOptions{
-		Validate: stdcli.Args(0),
-	})
-
-	e.Command("server certificate", "display the keep server certificate", e.ServerCertificate, stdcli.CommandOptions{
+	e.Command("list", "list installed applications", e.List, stdcli.CommandOptions{
 		Validate: stdcli.Args(0),
 	})
 

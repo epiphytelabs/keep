@@ -8,12 +8,11 @@ import (
 	"github.com/mitchellh/go-homedir"
 )
 
-func (e *Engine) ServerCertificate(ctx *stdcli.Context) error {
-
-	return nil
-}
-
 func (e *Engine) ServerInstall(ctx *stdcli.Context) error {
+	if err := docker.Info(); err != nil {
+		return fmt.Errorf("could not connect to docker")
+	}
+
 	ctx.Startf("installing server")
 
 	if _, err := docker.ContainerInspect("keep"); err == nil {
@@ -55,6 +54,10 @@ func (e *Engine) ServerInstall(ctx *stdcli.Context) error {
 }
 
 func (e *Engine) ServerUninstall(ctx *stdcli.Context) error {
+	if err := docker.Info(); err != nil {
+		return fmt.Errorf("could not connect to docker")
+	}
+
 	_ = e.serverUninstallStop(ctx)
 	_ = e.serverUninstallRemove(ctx)
 

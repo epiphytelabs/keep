@@ -9,15 +9,15 @@ import (
 )
 
 func (e *Engine) Uninstall(ctx *stdcli.Context) error {
+	if err := docker.Info(); err != nil {
+		return fmt.Errorf("could not connect to docker")
+	}
+
 	name := ctx.Arg(0)
 
 	a, err := repository.Get(name)
 	if err != nil {
 		return err
-	}
-
-	if !a.Installed {
-		return fmt.Errorf("not installed")
 	}
 
 	if err := e.uninstallRemoveApp(ctx, a); err != nil {

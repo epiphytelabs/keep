@@ -7,6 +7,7 @@ require (
 	github.com/goware/modvendor v0.5.0
 	github.com/miekg/dns v1.1.50
 	github.com/mitchellh/go-homedir v1.1.0
+	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8
 	gopkg.in/yaml.v3 v3.0.1
 )
 
