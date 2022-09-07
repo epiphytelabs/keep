@@ -5,6 +5,7 @@ import (
 
 	"github.com/ddollar/stdcli"
 	"github.com/epiphytelabs/keep/pkg/docker"
+	"github.com/mitchellh/go-homedir"
 )
 
 func (e *Engine) ServerCertificate(ctx *stdcli.Context) error {
@@ -19,6 +20,11 @@ func (e *Engine) ServerInstall(ctx *stdcli.Context) error {
 		return fmt.Errorf("already installed")
 	}
 
+	config, err := homedir.Expand("~/.keep")
+	if err != nil {
+		return err
+	}
+
 	c := docker.Container{
 		Name:  "keep",
 		Image: fmt.Sprintf("epiphytelabs/keep:%s", e.Version),
@@ -28,7 +34,7 @@ func (e *Engine) ServerInstall(ctx *stdcli.Context) error {
 		},
 		Networks: []string{"keep"},
 		Volumes: map[string]string{
-			"/Users/david/.keep":   "/etc/keep",
+			config:                 "/etc/keep",
 			"/var/run/docker.sock": "/var/run/docker.sock",
 		},
 	}

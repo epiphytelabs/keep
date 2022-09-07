@@ -6,6 +6,7 @@ require (
 	github.com/ddollar/stdcli v1.0.3
 	github.com/goware/modvendor v0.5.0
 	github.com/miekg/dns v1.1.50
+	github.com/mitchellh/go-homedir v1.1.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 

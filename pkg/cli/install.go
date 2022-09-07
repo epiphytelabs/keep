@@ -35,6 +35,8 @@ func (e *Engine) Install(ctx *stdcli.Context) error {
 		return err
 	}
 
+	ctx.Writef("url: <url>https://%s.app.keep</url>", name)
+
 	return nil
 }
 
